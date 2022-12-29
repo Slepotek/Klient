@@ -9,8 +9,6 @@
 
 #define NUMER_STUDENTA 1
 
-struct sockaddr_in socketAddres; //inserted for training but will be needed
-struct sockaddr socketAddresNative;
 void operacja1 (int *sock_descr, struct sockaddr_in* saddr, int *addr_len, /*unsigned char* buff,*/ int *dane, int rozm_dane);
 
 int main (void)
