@@ -1,6 +1,13 @@
 #ifndef STRUKTURY_H
 #define STRUKTURY_H
 
+typedef struct {
+	int *liczba;
+	struct Element_listy *poprzedni;
+	struct Element_listy *nastepny;
+	struct Element_listy *pierwszy;
+}Element_listy;
+
 //definicja struktury naglowka ip
 struct iphead
 {
@@ -83,10 +90,15 @@ struct pwphead
 #define KOD3 3 //Odejmowanie
 #define KOD4 4 //Mnozenie
 #define KOD5 5 //Dzielenie
+#define KOD6 6 //Wynik operacji 
 #define KOD7 7 //Poprawny odbior
 
-#define TYP1 1 //Tylko adres MAC
+#define TYP1 1 /*Tylko adres MAC*/
 #define TYP2 2 //Tylko adres IP
 #define TYP3 3 //Tylko liczby
+#define TYP4 4 //Potwierdzenie
+//MAC, IP, liczby
+#define TYP5 5 //MAC, IP, liczby
+
 
 #endif 
