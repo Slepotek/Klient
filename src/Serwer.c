@@ -7,6 +7,7 @@
 #include <linux/if.h>// this one supposignly gets the mac address TODO: compleate the reference
 #include <sys/ioctl.h>// this one contains macro SIOCGIFHWADDR that does TODO: compleate what this macro does
 #include <linux/if_ether.h>
+#include <unistd.h>
 
 #define NUMERSTUDENTA 1
 void PrintIpHddr(unsigned char *data, int Size); //funkcja do wyswietlenia naglowka IP + wpisanie danych do wlasnej struktury z naglowkiem
@@ -78,8 +79,8 @@ int main (void)
         bufor_poz = bufor_poz + sizeof(iphddr);
         printf("\nNaglowek IP wyglada tak: \n");
         PrintIpHddr(&iphddr, sizeof(iphddr));
-        klient.sin_addr.s_addr = inet_addr("127.0.0.12");
-        klient.sin_family = PF_INET;
+        klient.sin_addr.s_addr = iphddr.zrodlo;
+        klient.sin_family = AF_INET;
         klient.sin_port = htons(7777);
         struct pwphead naglowek;
         memcpy(&naglowek, bufor+bufor_poz, sizeof(naglowek));
@@ -145,12 +146,8 @@ int main (void)
                 printf("Nieprawidlowa operacja\n");
                 break;
         }
-        int rec = sendto(sock_r, bufor, 65535, 0, (struct sockaddr*)&klient, (socklen_t*)&sockaddr_len);
-        if(rec < 0)
-        {
-            printf("Nie udalo sie wyslac wiadomosci\n");
-            printf("Mozliwe zablokowanie gniazda lub, blad konfiguracji\n");
-        }
+        memset(bufor, 0, 65536);
+        printf("Poprawnie wyslano potwierdzenie odebrania danych do klienta.");
     }
 }
 
@@ -284,4 +281,12 @@ void WyslijZwrot(struct pwphead *hddr, unsigned char* buff, int* sock_descr)
 {
     memset(buff, 0, 65536);
     memcpy(buff, hddr, sizeof(*hddr));
+    int sizeOfBuff = sizeof(*hddr);
+    int *psockAddrLen = &sockaddr_len;
+    int rozmiar_danych = sendto(*sock_descr, buff, sizeOfBuff, 0, (struct sockaddr*)&klient, *psockAddrLen);
+    if(rozmiar_danych < 0)
+    {
+        printf("Nie udalo sie wyslac wiadomosci\n");
+        printf("Mozliwe zablokowanie gniazda lub, blad konfiguracji\n");
+    }
 }

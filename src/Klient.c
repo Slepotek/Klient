@@ -4,18 +4,20 @@
 #include <string.h> //memcpy, memset, strcpy, etc.
 #include <sys/socket.h> //socklen_t, sockaddr, msghdr, etc.
 #include "struktury.h"
+#include <unistd.h>
 #include <linux/if.h>// this one supposignly gets the mac address TODO: compleate the reference
 #include <sys/ioctl.h>// this one contains macro SIOCGIFHWADDR that does TODO: compleate what this macro does
 
 #define NUMER_STUDENTA 1
 
 void operacja1 (int *sock_descr, struct sockaddr_in* saddr, int *addr_len, /*unsigned char* buff,*/ int *dane, int rozm_dane);
+struct sockaddr_in klient, serwer;
 
 int main (void)
 {
     int sock_r = 0;
     int sockaddr_len = 0;
-    struct sockaddr_in klient, serwer;
+
     sockaddr_len = sizeof(klient);
     printf("Otwieram gniazdo Klienta:\n");
     sock_r = socket(AF_INET, SOCK_RAW, 144+NUMER_STUDENTA);
@@ -37,7 +39,15 @@ int main (void)
     serwer.sin_family = AF_INET;
     serwer.sin_port = htons(7777);
     serwer.sin_addr.s_addr = inet_addr("127.0.0.13");
+    printf("Wybierz typ operacji jaka chcesz wykonac: \n");
+    
     operacja1(&sock_r, &serwer, &sockaddr_len, /*buffer,*/ NULL, 0);
+    unsigned char* buff = (unsigned char*)malloc(65536);
+    int rec = recvfrom(sock_r, buff, 65536, 0, (struct sockaddr*)&serwer, (socklen_t*)&sockaddr_len);
+    if (rec < 0)
+    {
+        printf("Blad podczas odbierania danych\n");
+    }
 
     return EXIT_SUCCESS;
 }
@@ -55,21 +65,6 @@ void operacja1 (int *sock_descr, struct sockaddr_in* saddr, int *addr_len, /*uns
     naglowek.typDanych = TYP5;
     naglowek.wersja = 1;
     naglowek.opcje.optKod = 0;
-
-
-    //do usuniecia w ostatecznej wersji
-    // struct iphead ipheader; 
-    // ipheader.calk_dlug = sizeof(struct iphead)+dane_rozm+naglowek.headDlug;
-    // ipheader.czas_zy = 255;
-    // ipheader.destyn = inet_addr("127.0.1.13");
-    // ipheader.dlugosc = 5;
-    // ipheader.frag_flagi = 0;
-    // ipheader.identy = htonl(12345);
-    // ipheader.protok = 144 + NUMER_STUDENTA;
-    // ipheader.suma_kontr = 0;
-    // ipheader.uslug_ecn = 0xe0;
-    // ipheader.wersja = 4;
-    // ipheader.zrodlo = inet_addr("127.0.0.12");
 
     /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       + Procedura wyluskania adresu MAC przypisanego do gniazda +
@@ -93,8 +88,6 @@ void operacja1 (int *sock_descr, struct sockaddr_in* saddr, int *addr_len, /*uns
         //display mac address
         printf("Mac : %.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n" , mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
     }
-
-    
     /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       +           Koniec procedury wyluskania adresu MAC                +
       +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -105,14 +98,12 @@ void operacja1 (int *sock_descr, struct sockaddr_in* saddr, int *addr_len, /*uns
     printf("Adres IP gniazda klienta :%s\n", inet_ntoa(ipAddres.sin_addr));
 
     int *wektor_liczb = malloc(sizeof(int)*10);
-    printf("Podaj 10 liczb: ");
+    printf("Podaj 10 liczb: \n");
     for(int i = 0; i < 10; i++)
     {
         scanf("%d", &wektor_liczb[i]);
     }
-    //do wyrzucenia w ostatecznej wersji
-    //memcpy(buff, &ipheader, sizeof(ipheader));
-    //buffer_len = sizeof(ipheader);
+
     memcpy(buff+buffer_len, &naglowek, sizeof(naglowek));
     buffer_len =buffer_len+sizeof(naglowek);
     memcpy(buff+buffer_len, mac_addr, 6);
@@ -125,7 +116,7 @@ void operacja1 (int *sock_descr, struct sockaddr_in* saddr, int *addr_len, /*uns
     int rec = sendto(*sock_descr, buff, buffer_len, 0, (struct sockaddr*)saddr, *addr_len);
     if (rec < 0)
     {
-        printf("Blad podczas wysylania");
+        printf("Blad podczas wysylania\n");
     }
-    close(*sock_descr);
+    memset(buff, 0, 65536);
 }
