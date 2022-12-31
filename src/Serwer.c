@@ -147,7 +147,7 @@ int main (void)
                 break;
         }
         memset(bufor, 0, 65536);
-        printf("Poprawnie wyslano potwierdzenie odebrania danych do klienta.");
+        printf("Poprawnie wyslano potwierdzenie odebrania danych do klienta.\n");
     }
 }
 
