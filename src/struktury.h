@@ -71,9 +71,10 @@ struct icmphead
 
 struct pwpopcje
 {
-    unsigned int optKod:4;
-    unsigned int optDlug:4;
-    unsigned int *optDane;
+    unsigned int optKod:8;//1 bajt
+    unsigned int optDlug;//4 bajty
+    unsigned char *optDane;//1 bajt
+	//6 bajtow
 };
 
 struct pwphead
@@ -83,6 +84,7 @@ struct pwphead
     unsigned int typDanych:4;
     unsigned int headDlug:4;
     unsigned short rozmDanych;
+	//do tego momentu sa 4 bajty
     struct pwpopcje opcje;
 };
 #define KOD1 1 //Brak operacji

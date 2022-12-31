@@ -11,8 +11,10 @@
 #define NUMER_STUDENTA 1
 
 void operacja1 (unsigned char * buff, int *sock_descr);
+void operacja2(unsigned char* buff, int * sock_descr);
 void Odbierz(int * sock_descr, unsigned char * bufor);
 void Wyslij(int *sock_descr, unsigned char *bufor);
+void PobierzAdresMac (int *sock_descr, unsigned char* mac_addr);
 struct sockaddr_in klient, serwer;
 int sockaddr_len = 0;
 int buffer_len = 0;
@@ -55,9 +57,9 @@ int main (void)
 
     switch (wyb)
     {
+        struct pwphead naglowek;
         case 1:
             operacja1(buff, &sock_r);
-            struct pwphead naglowek;
             Wyslij(&sock_r, buff);
             do
             {
@@ -72,7 +74,19 @@ int main (void)
             printf("Wiadomosc przeslano i odebrano przez serwer.\n");
             break;
         case 2:
-            //TODO: Zaimplementowac operacje 2
+            operacja2(buff, &sock_r);
+            Wyslij(&sock_r, buff);
+            do
+            {
+                struct iphead ipHead;
+                int poz = 0;
+                Odbierz(&sock_r, buff);
+                memcpy(&ipHead, buff, sizeof(ipHead));
+                poz = poz + sizeof(ipHead);
+                memcpy(&naglowek, buff+poz, sizeof(naglowek));
+                poz = poz + sizeof(naglowek);
+            } while (naglowek.typDanych != TYP4);  
+            printf("Wiadomosc przeslano i odebrano przez serwer.\n");
             break;
         case 3:
             //TODO: Zaimplementowac operacje 3
@@ -95,35 +109,15 @@ void operacja1 (unsigned char * buff, int *sock_descr)
     memset(buff, 0, sizeof(*buff));
     //budujemy naglowek wlasnego protokolu
     struct pwphead naglowek;
-    naglowek.headDlug = 4; // domyslnie dlugosc naglowka to 4 bajty
+    naglowek.headDlug = 6; // domyslnie dlugosc naglowka to 4 bajty
     naglowek.kodOper = KOD1;
     naglowek.rozmDanych = sizeof(struct in_addr)+(sizeof(int)*10)+6; //TODO: Uzupelnic tutaj
     naglowek.typDanych = TYP5;
     naglowek.wersja = 1;
     naglowek.opcje.optKod = 0;
 
-    /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      + Procedura wyluskania adresu MAC przypisanego do gniazda +
-      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-    struct ifreq s; //struct for socket ioctl's, it can contain among others the MAC address of the interface attached to the socket
-    char *if_name = "enp0s3"; //tak dziala, w przypadku zwyklego srodowiska wystarczy dowolny interfejs
-    unsigned char *mac_addr = NULL;
-    int if_name_len = IFNAMSIZ;
-
-    memset(&s, 0, sizeof(struct ifreq));
-
-    s.ifr_addr.sa_family = AF_INET;
-    strncpy(s.ifr_name, if_name, IFNAMSIZ-1);
-
-    if(0 == ioctl(*sock_descr, SIOCGIFHWADDR, &s))
-    {
-        mac_addr = (unsigned char*)s.ifr_hwaddr.sa_data;
-        //display mac address
-        printf("Mac : %.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n" , mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-    }
-    /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      +           Koniec procedury wyluskania adresu MAC                +
-      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    unsigned char *mac_addr = (unsigned char*)malloc(sizeof(unsigned char)*6);
+    PobierzAdresMac(sock_descr, mac_addr);
 
     //wpisz do struktury adresu ip adres ip klienta (tak lepiej jest go przeslac)
     struct sockaddr_in ipAddres;
@@ -170,4 +164,72 @@ void Wyslij(int *sock_descr, unsigned char *bufor)
     }
     memset(bufor, 0, 65536);
     buffer_len = 0;
+}
+
+void PobierzAdresMac (int *sock_descr, unsigned char* mac_addrr)
+{
+    /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      + Procedura wyluskania adresu MAC przypisanego do gniazda +
+      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    struct ifreq s; //struct for socket ioctl's, it can contain among others the MAC address of the interface attached to the socket
+    char *if_name = "enp0s3"; //tak dziala, w przypadku zwyklego srodowiska wystarczy dowolny interfejs
+    int if_name_len = IFNAMSIZ;
+
+    memset(&s, 0, sizeof(struct ifreq));
+
+    s.ifr_addr.sa_family = AF_INET;
+    strncpy(s.ifr_name, if_name, IFNAMSIZ-1);
+
+    if(0 == ioctl(*sock_descr, SIOCGIFHWADDR, &s))
+    {
+        memcpy(mac_addrr,(unsigned char*)s.ifr_hwaddr.sa_data, sizeof(unsigned char)*6);
+        //display mac address
+        printf("Mac : %.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n" , mac_addrr[0], mac_addrr[1], mac_addrr[2], mac_addrr[3], mac_addrr[4], mac_addrr[5]);
+    }
+    /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      +           Koniec procedury wyluskania adresu MAC                +
+      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+}
+
+void operacja2(unsigned char* buff, int * sock_descr)//przeslac w opcjach adres mac, IP i 10 liczb
+{
+    memset(buff, 0, sizeof(*buff));
+    //budujemy naglowek wlasnego protokolu
+    struct pwphead naglowek;
+    naglowek.headDlug = 6; // domyslnie dlugosc naglowka to 24 bajty
+    naglowek.kodOper = KOD1;
+    naglowek.rozmDanych = 0; //nie przesylamy w polu danych nic, dane przesylamy w tym przypadku w polu opcji
+    naglowek.typDanych = TYP5;
+    naglowek.wersja = 1;
+    naglowek.opcje.optKod = 1;
+    naglowek.opcje.optDlug = 0;
+    naglowek.opcje.optDane = (unsigned char*)malloc(sizeof(struct in_addr)+(sizeof(int)*10)+6);
+
+    unsigned char *mac_addr = (unsigned char*)malloc(sizeof(unsigned char)*6);
+    PobierzAdresMac(sock_descr, mac_addr);
+
+    //wpisz do struktury adresu ip adres ip klienta (tak lepiej jest go przeslac)
+    struct sockaddr_in ipAddres;
+    int ipAddres_len = sizeof(struct sockaddr);
+    getsockname(*sock_descr, (struct sockaddr*) &ipAddres, (socklen_t*) &ipAddres_len);
+    printf("Adres IP gniazda klienta :%s\n", inet_ntoa(ipAddres.sin_addr));
+
+    //pobierz 10 liczb od uzytkownika
+    int *wektor_liczb = malloc(sizeof(int)*10);
+    printf("Podaj 10 liczb: \n");
+    for(int i = 0; i < 10; i++)
+    {
+        scanf("%d", &wektor_liczb[i]);
+    }
+
+    //Budowanie bufora z danymi
+    memcpy(naglowek.opcje.optDane, mac_addr, 6);
+    buffer_len =buffer_len+6;
+    memcpy(naglowek.opcje.optDane+buffer_len, &ipAddres.sin_addr, sizeof(struct in_addr));   
+    buffer_len =buffer_len+sizeof(struct in_addr);
+    memcpy(naglowek.opcje.optDane+buffer_len, wektor_liczb, sizeof(int)*10);
+    buffer_len = buffer_len+(sizeof(int)*10);
+    naglowek.opcje.optDlug = buffer_len;
+    buffer_len = buffer_len + sizeof(naglowek);
+    memcpy(buff, &naglowek, buffer_len);
 }

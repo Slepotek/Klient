@@ -87,6 +87,10 @@ int main (void)
         bufor_poz = bufor_poz+sizeof(naglowek);
         printf("Naglowek PWP wyglada tak:\n");
         PrintPwpHddr(&naglowek, sizeof(naglowek));
+        if (naglowek.opcje.optKod == 1)
+        {
+            bufor = naglowek.opcje.optDane;
+        }
         Element_listy *lista = (Element_listy*) malloc(sizeof(Element_listy));
         switch(naglowek.typDanych)
         {
@@ -101,7 +105,7 @@ int main (void)
                 naglowek.rozmDanych = 0;
                 naglowek.wersja = 1;
                 naglowek.opcje.optKod = 0;
-                naglowek.headDlug = sizeof(naglowek);
+                naglowek.headDlug = 6;
                 WyslijZwrot(&naglowek, bufor, &sock_r);
                 break;
             case TYP2:
@@ -113,7 +117,7 @@ int main (void)
                 naglowek.rozmDanych = 0;
                 naglowek.wersja = 1;
                 naglowek.opcje.optKod = 0;
-                naglowek.headDlug = sizeof(naglowek);
+                naglowek.headDlug = 6;
                 WyslijZwrot(&naglowek, bufor, &sock_r);
                 break;
             case TYP3:
@@ -125,7 +129,7 @@ int main (void)
                 naglowek.rozmDanych = 0;
                 naglowek.wersja = 1;
                 naglowek.opcje.optKod = 0;
-                naglowek.headDlug = sizeof(naglowek);
+                naglowek.headDlug = 6;
                 WyslijZwrot(&naglowek, bufor, &sock_r);
                 break;
             case TYP5:
@@ -139,7 +143,7 @@ int main (void)
                 naglowek.rozmDanych = 0;
                 naglowek.wersja = 1;
                 naglowek.opcje.optKod = 0;
-                naglowek.headDlug = sizeof(naglowek);
+                naglowek.headDlug = 6;
                 WyslijZwrot(&naglowek, bufor, &sock_r);
                 break;
             default:
@@ -181,7 +185,7 @@ void PrintPwpHddr(struct pwphead* data, int size)
     printf("|-PWP wersja: %d\n", data->wersja);
     printf("|-PWP kod operacji: %d\n", data->kodOper);
     printf("|-PWP typ danych: %d\n", data->typDanych);
-    printf("|-PWP dlugosc nagl: %d\n", data->headDlug);
+    printf("|-PWP dlugosc nagl: %d\n", ((unsigned int)(data->headDlug))*4);
     printf("|-PWP rozmiar danych: %d\n", data->rozmDanych);
     int optCheck = data->headDlug;
     if(optCheck == 4)
