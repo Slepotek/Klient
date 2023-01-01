@@ -36,7 +36,7 @@ int main (void)
     if (sock_r < 0)
     {
         printf("Blad podczas otwieraniu gniazda serwerowego. Przerywam program.\n");
-        printf("Sprawdz czy program uruchomiono jako root...");
+        printf("Sprawdz czy program uruchomiono jako root...\n");
         return 0;
     }
     printf("Gniazdo otwarte\n");
@@ -54,6 +54,7 @@ int main (void)
     printf("adres dowiazany\n");
     while(1)
     {
+        int bufor_poz = 0;
         printf("Uruchamiam nasluch...\n");
         rozmiar_danych = recvfrom(sock_r, bufor, 65536, 0, (struct sockaddr*)&serwer, (socklen_t*)&sockaddr_len);
         if (rozmiar_danych < 0)
@@ -62,18 +63,19 @@ int main (void)
         }
         int j = 0;
         printf("Odebralem ramke protokolu PWP: \n");
-        for (int i = 0; i <1000 ; i++) 
-        {
-            printf("%.2x ", bufor[i]);
-            j++;
-            if (0 == j%20)
-            { // wypisywanie po 20 oktetów
-                printf ("\n");
-            }
-        }
+        // Ponizsza procedura wyswietla pojedyncze bajty, przydatne podczas debugowania
+        // [MOZNA USUNAC]
+        // for (int i = 0; i <1000 ; i++) 
+        // {
+        //     printf("%.2x ", bufor[i]);
+        //     j++;
+        //     if (0 == j%20)
+        //     { // wypisywanie po 20 oktetów
+        //         printf ("\n");
+        //     }
+        // }
         printf("\n");
         printf("Naglowki przenoszonych protokolow: ");
-        int bufor_poz = 0;
         struct iphead iphddr;
         memcpy(&iphddr, bufor, sizeof(iphddr));
         bufor_poz = bufor_poz + sizeof(iphddr);
@@ -89,7 +91,11 @@ int main (void)
         PrintPwpHddr(&naglowek, sizeof(naglowek));
         if (naglowek.opcje.optKod == 1)
         {
-            bufor = naglowek.opcje.optDane;
+            printf("|-PWP Dane w opcjach:\n");
+        }
+        else
+        {
+            printf("\nDane: \n");
         }
         Element_listy *lista = (Element_listy*) malloc(sizeof(Element_listy));
         switch(naglowek.typDanych)
@@ -216,7 +222,6 @@ void print(Element_listy *element) {
 		element = element->nastepny; //przenieś adres do następnego elementu z listy
 	}
 }
-
 void usun(Element_listy **header, int pozycja) {
 	Element_listy *temp; //tymczasowa zmienna, używana żeby zapewnić spójność listy
 	Element_listy *pTemp; //tak samo jak wyżej
@@ -254,7 +259,6 @@ void PrintMacAddr(unsigned char * buff, int *poz)
     //display mac address
     printf("Mac: %.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n" , mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
 }
-
 void PrintIpAddr(unsigned char *buff, int *poz)
 {
     struct in_addr ipAdres;
