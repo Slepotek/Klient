@@ -69,14 +69,16 @@ struct icmphead
 	unsigned short suma_kontr;
 };
 
+//struktura opcji protokolu PWP (jak opcje nie sa przekazywane to struktura w naglowku i tak jest obecna)
 struct pwpopcje
 {
     unsigned int optKod:8;//1 bajt
     unsigned int optDlug;//4 bajty
-    unsigned char *optDane;//1 bajt
+    unsigned char *optDane;//1 bajt (bo to tylko wskaznik)
 	//6 bajtow
 };
 
+//struktura naglowka protokolu PWP
 struct pwphead
 {
     unsigned int wersja:4;
