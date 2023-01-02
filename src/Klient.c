@@ -8,7 +8,76 @@
 #include <linux/if.h>// this one supposignly gets the mac address TODO: compleate the reference
 #include <sys/ioctl.h>// this one contains macro SIOCGIFHWADDR that does TODO: compleate what this macro does
 
+/*
+    Mozna zmienic nazwy: 
+
+    operacja1
+    operacja2
+    operacja3
+    operacja4
+    operacja5
+    buffer_len
+    klient
+    serwer
+    sockaddr_len
+    sock_r
+    Odbierz
+    Wyslij
+    PobierzAdresMac
+    buff
+    sock_descr
+    bufor
+    mac_addr
+    wyb
+    naglowek
+    poz
+    ipHead
+    ipAddres
+    rec
+    if_name
+    if_name_len
+    s -> to tez zmienna znajduje sie w procedurze wyciagniecia adresu MAC -> zmienic recznie nie poprze CTRL+F
+    mac_addrr
+
+
+
+    Mozna zmienic ale nie polecam ( trzeba zmienic tez w pliku struktury.h)
+    iphead
+    dlugosc
+    wersja
+    uslug_ecn
+    calk_dlug
+    identy
+    frag_flagi
+    czas_zy
+    protok
+    suma_kontr
+    zrodlo
+    destyn
+    pwpopcje
+    optKod
+    optDlug
+    optDane
+    pwphead
+    kodOper
+    typDanych
+    headDlug
+    rozmDanych
+    opcje
+
+    Mozna tez zmienic nazwy makr
+    KOD1
+    KOD2
+    KOD3
+    itd...
+    TYP1
+    TYP2
+    TYP3
+    itd...
+*/
+
 #define NUMER_STUDENTA 1 //numer studenta ( nie wiem o ktory konkretnie numer chodzi ale chyba sobie rozkminicie )
+
 
 void operacja1(unsigned char *buff, int *sock_descr);//deklaracja operacji pierwszej (przeslanie w polu danych MAC, IP i 10 liczb)
 void operacja2(unsigned char *buff, int *sock_descr);//deklaracja operacji drugiej (przeslanie w polu opcji naglowka PWP MAC, IP i 10 liczb)

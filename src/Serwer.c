@@ -11,6 +11,77 @@
 
 #define NUMERSTUDENTA 1 //pamietac zeby zmienic na swoj numer, tak jak to tam ustali prowadzacy 
 
+/*Mozna zmienic nastepujace nazwy
+    PrintIpHddr
+    PrintPwpHddr
+    wstaw
+    print
+    usun
+    PrintMacAddr
+    PrintIpAddr
+    WyslijZwrot
+    LiczbyDoListy
+    source
+    dest
+    serwer
+    klient
+    sockaddr_len
+    sock_r
+    rozmiar_danych
+    bufor
+    iphddr
+    naglowek
+    lista
+    data
+    Size
+    element
+    header
+    hddr
+    buff
+    sock_descr
+    wsk_nagl
+    pozycja
+    poz
+
+    Mozna zmienic ale nie polecam ( trzeba zmienic tez w pliku struktury.h)
+    Element_listy
+    liczba
+    poprzedni
+    nastepny
+    pierwszy
+    iphead
+    dlugosc
+    wersja
+    uslug_ecn
+    calk_dlug
+    identy
+    frag_flagi
+    czas_zy
+    protok
+    suma_kontr
+    zrodlo
+    destyn
+    pwpopcje
+    optKod
+    optDlug
+    optDane
+    pwphead
+    kodOper
+    typDanych
+    headDlug
+    rozmDanych
+    opcje
+
+    Mozna tez zmienic nazwy makr
+    KOD1
+    KOD2
+    KOD3
+    itd...
+    TYP1
+    TYP2
+    TYP3
+    itd...
+*/
 
 void PrintIpHddr(unsigned char *data, int Size); //funkcja do wyswietlenia naglowka IP + wpisanie danych do wlasnej struktury z naglowkiem
 void PrintPwpHddr(struct pwphead* data, int size);//funkcja do wyswietlania naglowka PWP

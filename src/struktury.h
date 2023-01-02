@@ -1,6 +1,50 @@
 #ifndef STRUKTURY_H
 #define STRUKTURY_H
 
+/*Mozna zmienic nazwy takie jak:
+ALE UWAGA!!!! TRZEBA JE ZMIENIC TEZ W PLIKU Klient.c i Serwer.c
+
+Element_listy
+liczba
+poprzedni
+nastepny
+pierwszy
+iphead
+dlugosc
+wersja
+uslug_ecn
+calk_dlug
+identy
+frag_flagi
+czas_zy
+protok
+suma_kontr
+zrodlo
+destyn
+pwpopcje
+optKod
+optDlug
+optDane
+pwphead
+kodOper
+typDanych
+headDlug
+rozmDanych
+opcje
+
+Mozna tez zmienic nazwy makr
+KOD1
+KOD2
+KOD3
+itd...
+TYP1
+TYP2
+TYP3
+itd...
+
+ALE TEZ TRZEBA PAMIETAC ZEBY ZMIENIC W PLIKACH Serwer.c i Klient.c
+*/
+
 //struktura listy wiazanej
 typedef struct {
 	int *liczba;

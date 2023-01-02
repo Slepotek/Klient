@@ -3,6 +3,7 @@
 #include <string.h>
 #include "struktury.h"
 
+//PROGRAM NIE BEDZIE DZIALAL JESLI ZMIENILY SIE NAZWY W PLIKU struktury.h
 int main (void)
 {
     unsigned char * pointer;
